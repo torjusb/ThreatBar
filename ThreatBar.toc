@@ -1,0 +1,14 @@
+## Interface: 30300
+
+## Title: ThreatBar
+## Notes: A threatbar
+## Author: Nifty
+## Version: Alpha
+
+## OptionalDeps: tekDebug, tekErr
+
+## LoadManagers: AddonLoader
+## X-LoadOn-Always: delayed
+## X-LoadOn-Slash: /addontemplate
+
+core.lua
