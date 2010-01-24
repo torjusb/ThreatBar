@@ -31,8 +31,13 @@ local function SmoothUpdate (self)
 		self:SetScript('OnUpdate', nil)
 		return
 	end
-	self.bar:SetValue(currentVal + smoothSpeed)
-	self.bar.value:SetText(currentVal + smoothSpeed)
+	if newThreat > currentVal then
+		self.bar:SetValue(currentVal + smoothSpeed)
+		self.bar.value:SetText(currentVal + smoothSpeed)
+	elseif newThreat < currentVal then
+		self.bar:SetValue(currentVal - smoothSpeed)
+		self.bar.value:SetText(currentVal - smoothSpeed)
+	end
 end
 
 function ThreatBar:ADDON_LOADED (addon)
