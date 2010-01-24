@@ -58,8 +58,8 @@ function ThreatBar:ADDON_LOADED (addon)
 	self.bar.value:SetPoint('CENTER')
 	self.bar.value:SetFont(font, 6)
 	self.bar.value:SetTextColor(1, 1, 1)
-	
-	self.bar.value:SetText(1)
+		
+	self:Hide()
 	
 	self:UnregisterEvent('ADDON_LOADED')
 end
@@ -69,7 +69,7 @@ function ThreatBar:UNIT_THREAT_LIST_UPDATE ()
 	local threat = threatpct or 0
 	
 	if status == nil or rawthreatpct == 0 then
-	--	self:Hide()
+		self:Hide()
 		self:SetScript('OnUpdate', nil)
 		return
 	end
