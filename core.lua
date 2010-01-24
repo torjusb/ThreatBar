@@ -1,8 +1,9 @@
 -- Settings
 
-local bar_height = 5
-local bar_width  = 100
-local texture 	 = [=[Interface\AddOns\oUF_Nifty\textures\statusbar]=]
+local bar_height  = 5
+local bar_width   = 100
+local texture 	  = [=[Interface\AddOns\oUF_Nifty\textures\statusbar]=]
+local smoothSpeed = 2
 
 local backdrop = {
 	bgFile = [=[Interface\ChatFrame\ChatFrameBackground]=],
@@ -17,10 +18,20 @@ local colors = {
 
 -- Addon
 local ThreatBar = CreateFrame('Frame')
+local newThreat
 
 ThreatBar:SetScript('OnEvent', function(self, event, ...) self[event](self, ...) end)
 ThreatBar:RegisterEvent('UNIT_THREAT_LIST_UPDATE')
 ThreatBar:RegisterEvent('ADDON_LOADED')
+
+local function SmoothUpdate (self)
+	local currentVal = self.bar:GetValue()
+	if newThreat == currentVal then
+		self:SetScript('OnUpdate', nil)
+		return
+	end
+	self.bar:SetValue(currentVal + smoothSpeed)
+end
 
 function ThreatBar:ADDON_LOADED (addon)
 	if addon:lower() ~= 'threatbar' then return end
@@ -38,23 +49,30 @@ function ThreatBar:ADDON_LOADED (addon)
 	self.bar:SetWidth(bar_width + 1)
 	self.bar:SetHeight(bar_height + 1)
 	self.bar:SetStatusBarTexture(texture)
-	self.bar:SetMinMaxValues(0, 100)	
+	self.bar:SetMinMaxValues(0, 100)
+	self.bar:SetValue(50)
 	
 	self:UnregisterEvent('ADDON_LOADED')
 end
 
 function ThreatBar:UNIT_THREAT_LIST_UPDATE () 
-	local isTanking, status, threatpct, rawthreatpct, threatvalue = UnitDetailedThreatSituation('player', 'target')
-	
+	local isTanking, status, threatpct, rawthreatpct, threatvalue = UnitDetailedThreatSituation('player', 'target')	
 	local threat = threatpct or 0
 	
 	if status == nil or rawthreatpct == 0 then
-		--self:Hide()
+		self:Hide()
+		self:SetScript('OnUpdate', nil)
 		return
+	end
+		
+	if threat == self.bar:GetValue() then
+		self:SetScript('OnUpdate', nil)
+	else
+		newThreat = threat
+		self:SetScript('OnUpdate', SmoothUpdate)
 	end
 	
 	self:Show()
-	ThreatBar.bar:SetValue(threat)
 		
 	if threat < 30 then 
 		ThreatBar.bar:SetStatusBarColor(unpack(colors[1]))
